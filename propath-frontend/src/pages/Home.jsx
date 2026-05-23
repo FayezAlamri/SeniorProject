@@ -69,6 +69,13 @@ function Home() {
             I'm an Employer
           </Link>
 
+          <Link
+            to="/jobs"
+            className="border border-gray-300 text-gray-600 px-6 py-3 rounded-lg hover:border-teal-400 transition"
+          >
+            Browse Jobs
+          </Link>
+
         </div>
 
       </div>

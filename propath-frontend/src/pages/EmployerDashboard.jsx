@@ -74,12 +74,6 @@ function EmployerDashboard() {
     if (!error) setJobs((prev) => prev.filter((j) => j.id !== jobId))
   }
 
-  // --- Sign out ---
-  const handleSignOut = async () => {
-    await supabase.auth.signOut()
-    navigate("/login")
-  }
-
   const statusColors = {
     new: "bg-blue-100 text-blue-700",
     reviewing: "bg-yellow-100 text-yellow-700",
@@ -100,21 +94,13 @@ function EmployerDashboard() {
       <div className="min-h-screen bg-[#eaf2f7] flex flex-col items-center px-6 py-12">
 
         {/* TITLE */}
-        <div className="mb-8 text-center w-full max-w-4xl flex justify-between items-start flex-wrap gap-4">
-          <div>
-            <h1 className="text-3xl font-bold mb-1">Employer Dashboard</h1>
-            <p className="text-gray-600">Manage job posts and find the best candidates with AI</p>
-          </div>
-          <button
-            onClick={handleSignOut}
-            className="text-sm text-gray-500 hover:text-red-500 transition border border-gray-300 px-4 py-2 rounded-lg"
-          >
-            Sign Out
-          </button>
+        <div className="mb-8 text-center w-full max-w-4xl">
+          <h1 className="text-3xl font-bold mb-1">Employer Dashboard</h1>
+          <p className="text-gray-600">Manage job posts and find the best candidates with AI</p>
         </div>
 
         {/* QUICK ACTION CARDS */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl mb-8">
 
           <div className="bg-white p-8 rounded-xl shadow text-center hover:shadow-md transition">
             <h3 className="font-semibold text-lg mb-2">Post a Job</h3>
@@ -127,10 +113,23 @@ function EmployerDashboard() {
           </div>
 
           <div className="bg-white p-8 rounded-xl shadow text-center hover:shadow-md transition">
-            <div className="text-3xl font-bold text-teal-600 mb-1">{jobs.length}</div>
+            <h3 className="font-semibold text-lg mb-2">View Applicants</h3>
+            <p className="text-gray-500 mb-4">Review everyone who applied to your jobs</p>
+            <div className="text-3xl font-bold text-blue-600 mb-3">{candidates.length}</div>
+            <Link to="/applicants">
+              <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
+                See Applicants
+              </button>
+            </Link>
+          </div>
+
+          <div className="bg-white p-8 rounded-xl shadow text-center hover:shadow-md transition">
+            <h3 className="font-semibold text-lg mb-2">Job Stats</h3>
             <p className="text-gray-500 mb-2">Active job postings</p>
-            <div className="text-2xl font-bold text-blue-600">{candidates.length}</div>
-            <p className="text-gray-500">Total applicants</p>
+            <div className="text-3xl font-bold text-teal-600 mb-1">{jobs.length}</div>
+            <p className="text-gray-500 text-sm mt-3">
+              {candidates.filter(c => c.status === "new").length} unreviewed · {candidates.filter(c => c.status === "shortlisted").length} shortlisted
+            </p>
           </div>
 
         </div>
