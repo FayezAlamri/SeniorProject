@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
+import Navbar from "../components/Navbar"
 import { supabase } from "../supabaseClient"
 
 const JOB_TYPES = ["All", "Full-time", "Part-time", "Contract", "Internship", "Freelance", "Remote"]
@@ -97,21 +98,8 @@ function JobBoard() {
   return (
     <div className="min-h-screen bg-[#eaf2f7]">
 
-      {/* Navbar */}
-      <div className="flex justify-between items-center px-10 py-4 bg-white shadow-sm sticky top-0 z-10">
-        <Link to="/home" className="flex items-center gap-2">
-          <div className="bg-teal-600 text-white p-2 rounded-lg w-8 h-8" />
-          <span className="font-bold text-lg">ProPath AI</span>
-        </Link>
-        <div className="flex items-center gap-4">
-          <Link to="/jobseeker" className="text-sm text-gray-500 hover:text-teal-600 transition font-medium">
-            My Dashboard
-          </Link>
-          <Link to="/login" className="text-sm bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700 transition">
-            Sign In
-          </Link>
-        </div>
-      </div>
+      {/* NAVBAR — unified component */}
+      <Navbar />
 
       {/* Hero */}
       <div className="bg-white border-b border-gray-100 px-10 py-10">

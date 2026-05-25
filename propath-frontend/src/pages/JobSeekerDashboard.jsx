@@ -1,5 +1,7 @@
-import { useRef, useState } from "react"
+import { useRef, useState, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
 import Navbar from "../components/Navbar"
+import { supabase } from "../supabaseClient"
 
 function ScoreRing({ score, label }) {
   const radius = 40
@@ -51,12 +53,34 @@ function DemandBadge({ trend }) {
 }
 
 function JobSeekerDashboard() {
+  const navigate = useNavigate()
   const fileInputRef = useRef()
   const [fileName, setFileName] = useState("")
   const [file, setFile] = useState(null)
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState(null)
   const [error, setError] = useState("")
+  const [authChecked, setAuthChecked] = useState(false)
+
+  // Role guard — employers get redirected to their dashboard
+  useEffect(() => {
+    supabase.auth.getUser().then(async ({ data }) => {
+      if (!data.user) { navigate("/login", { replace: true }); return }
+
+      // Check user_metadata first (set at signup, no RLS needed), then profiles table
+      let role = data.user.user_metadata?.role
+      if (!role) {
+        const { data: profile } = await supabase
+          .from("profiles").select("role").eq("id", data.user.id).single()
+        role = profile?.role
+      }
+
+      if (role === "employer") { navigate("/employer", { replace: true }); return }
+      setAuthChecked(true)
+    })
+  }, [navigate])
+
+  if (!authChecked) return null
 
   const handleClick = () => fileInputRef.current.click()
 
@@ -110,13 +134,11 @@ function JobSeekerDashboard() {
 
       <div className="min-h-screen bg-[#eaf2f7] px-10 py-12">
 
-        {/* TITLE */}
         <div className="mb-10">
           <h1 className="text-3xl font-bold mb-2">Job Seeker Dashboard</h1>
           <p className="text-gray-600">Upload your CV and let AI guide your career development</p>
         </div>
 
-        {/* UPLOAD BOX */}
         <div className="border-2 border-dashed border-gray-300 rounded-xl p-16 text-center bg-white max-w-3xl mx-auto">
           <div className="text-4xl mb-4">⬆️</div>
           <h2 className="text-xl font-semibold mb-2">Upload Your CV for AI Analysis</h2>
@@ -165,11 +187,9 @@ function JobSeekerDashboard() {
           )}
         </div>
 
-        {/* RESULTS */}
         {result && (
           <div className="max-w-3xl mx-auto mt-10 space-y-6">
 
-            {/* Header card: name, domain, score */}
             <div className="bg-white rounded-xl p-6 shadow-sm flex items-center justify-between gap-4 flex-wrap">
               <div>
                 <h2 className="text-2xl font-bold text-gray-800">{result.name || "Candidate"}</h2>
@@ -185,13 +205,11 @@ function JobSeekerDashboard() {
               )}
             </div>
 
-            {/* Summary */}
             <div className="bg-white rounded-xl p-6 shadow-sm">
               <h3 className="text-lg font-bold mb-2">📋 Critical Assessment</h3>
               <p className="text-gray-600 leading-relaxed">{result.summary}</p>
             </div>
 
-            {/* Strengths */}
             {result.strengths && result.strengths.length > 0 && (
               <div className="bg-white rounded-xl p-6 shadow-sm">
                 <h3 className="text-lg font-bold mb-3">✅ Genuine Strengths</h3>
@@ -206,7 +224,6 @@ function JobSeekerDashboard() {
               </div>
             )}
 
-            {/* Missing Skills */}
             <div className="bg-white rounded-xl p-6 shadow-sm">
               <h3 className="text-lg font-bold mb-1">⚠️ Skills You Need to Build</h3>
               <p className="text-sm text-gray-400 mb-3">Not found in your CV — but required for {result.targetDomain} roles</p>
@@ -219,7 +236,6 @@ function JobSeekerDashboard() {
               </div>
             </div>
 
-            {/* Recommended Courses */}
             <div className="bg-white rounded-xl p-6 shadow-sm">
               <h3 className="text-lg font-bold mb-1">🎓 Recommended Courses</h3>
               <p className="text-sm text-gray-400 mb-4">Real courses to close your skill gaps</p>
@@ -235,12 +251,8 @@ function JobSeekerDashboard() {
                     <div className="flex items-center gap-3">
                       <span className="text-teal-600 font-bold whitespace-nowrap">{course.price}</span>
                       {course.url && (
-                        <a
-                          href={course.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-xs bg-teal-50 text-teal-700 border border-teal-200 px-2 py-1 rounded hover:bg-teal-100"
-                        >
+                        <a href={course.url} target="_blank" rel="noopener noreferrer"
+                          className="text-xs bg-teal-50 text-teal-700 border border-teal-200 px-2 py-1 rounded hover:bg-teal-100">
                           Search →
                         </a>
                       )}
@@ -250,7 +262,6 @@ function JobSeekerDashboard() {
               </div>
             </div>
 
-            {/* Job Recommendations */}
             <div className="bg-white rounded-xl p-6 shadow-sm">
               <h3 className="text-lg font-bold mb-1">💼 Realistic Job Matches</h3>
               <p className="text-sm text-gray-400 mb-4">Based on your current skills — with honest gaps to close</p>
@@ -272,7 +283,6 @@ function JobSeekerDashboard() {
               </div>
             </div>
 
-            {/* Next Steps */}
             {result.nextSteps && result.nextSteps.length > 0 && (
               <div className="bg-white rounded-xl p-6 shadow-sm">
                 <h3 className="text-lg font-bold mb-3">🚀 Your 30-Day Action Plan</h3>
@@ -292,7 +302,6 @@ function JobSeekerDashboard() {
           </div>
         )}
 
-        {/* FEATURES — hide after results load */}
         {!result && (
           <div className="grid grid-cols-3 gap-10 text-center mt-14 max-w-4xl mx-auto">
             <div>

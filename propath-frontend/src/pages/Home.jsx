@@ -1,45 +1,12 @@
 import { Link } from "react-router-dom"
+import Navbar from "../components/Navbar"
 
 function Home() {
   return (
     <div>
 
-      {/* NAVBAR */}
-      <div className="flex justify-between items-center px-10 py-4 bg-white shadow-sm">
-
-        <div className="flex items-center gap-2">
-          <div className="bg-teal-600 text-white p-2 rounded-lg"></div>
-          <h2 className="font-bold text-lg">ProPath AI</h2>
-        </div>
-
-        <div className="flex items-center gap-6">
-
-          <Link to="/home" className="text-gray-600">
-            Home
-          </Link>
-
-          <a href="#features" className="text-gray-600">
-            Features
-          </a>
-
-          <a href="#contact" className="text-gray-600">
-            Contact
-          </a>
-
-          <Link to="/login" className="text-gray-600">
-            Login
-          </Link>
-
-          <Link
-            to="/register"
-            className="bg-teal-600 text-white px-4 py-2 rounded-lg"
-          >
-            Get Started
-          </Link>
-
-        </div>
-      </div>
-
+      {/* NAVBAR — unified component */}
+      <Navbar />
 
       {/* HERO SECTION */}
       <div className="text-center py-20 bg-[#eaf2f7]">
@@ -55,12 +22,12 @@ function Home() {
 
         <div className="flex justify-center gap-4">
 
-        <Link
-    to="/jobseeker"
-    className="bg-teal-600 text-white px-6 py-3 rounded-lg"
-  >
-    I'm a Job Seeker
-  </Link>
+          <Link
+            to="/jobseeker"
+            className="bg-teal-600 text-white px-6 py-3 rounded-lg"
+          >
+            I'm a Job Seeker
+          </Link>
 
           <Link
             to="/employer"

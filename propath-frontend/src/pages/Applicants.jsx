@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
+import Navbar from "../components/Navbar"
 import { supabase } from "../supabaseClient"
 
 const STATUS_OPTIONS = ["new", "reviewing", "shortlisted", "rejected"]
 
 const statusStyle = {
-  new:        { badge: "bg-blue-100 text-blue-700",   dot: "bg-blue-500",   label: "New" },
+  new:        { badge: "bg-blue-100 text-blue-700",    dot: "bg-blue-500",   label: "New" },
   reviewing:  { badge: "bg-yellow-100 text-yellow-700", dot: "bg-yellow-500", label: "Reviewing" },
   shortlisted:{ badge: "bg-green-100 text-green-700",  dot: "bg-green-500",  label: "Shortlisted" },
-  rejected:   { badge: "bg-red-100 text-red-700",     dot: "bg-red-400",    label: "Rejected" },
+  rejected:   { badge: "bg-red-100 text-red-700",      dot: "bg-red-400",    label: "Rejected" },
 }
 
 function StatusBadge({ status }) {
@@ -84,7 +85,6 @@ function Applicants() {
     return jobMatch && statusMatch
   })
 
-  // Count per status for summary
   const counts = {
     all: candidates.length,
     new: candidates.filter(c => c.status === "new").length,
@@ -96,16 +96,8 @@ function Applicants() {
   return (
     <div className="min-h-screen bg-[#eaf2f7]">
 
-      {/* Navbar */}
-      <div className="flex justify-between items-center px-10 py-4 bg-white shadow-sm sticky top-0 z-10">
-        <Link to="/employer" className="flex items-center gap-2">
-          <div className="bg-teal-600 w-8 h-8 rounded-lg" />
-          <span className="font-bold text-lg">ProPath AI</span>
-        </Link>
-        <Link to="/employer" className="text-sm text-gray-500 hover:text-teal-600 transition font-medium">
-          ← Back to Dashboard
-        </Link>
-      </div>
+      {/* NAVBAR — unified component */}
+      <Navbar />
 
       <div className="max-w-5xl mx-auto px-6 py-10">
 
@@ -118,11 +110,11 @@ function Applicants() {
         {/* Summary cards */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-8">
           {[
-            { label: "Total", key: "all", color: "text-gray-800" },
-            { label: "New", key: "new", color: "text-blue-600" },
-            { label: "Reviewing", key: "reviewing", color: "text-yellow-600" },
+            { label: "Total",       key: "all",         color: "text-gray-800" },
+            { label: "New",         key: "new",         color: "text-blue-600" },
+            { label: "Reviewing",   key: "reviewing",   color: "text-yellow-600" },
             { label: "Shortlisted", key: "shortlisted", color: "text-green-600" },
-            { label: "Rejected", key: "rejected", color: "text-red-500" },
+            { label: "Rejected",    key: "rejected",    color: "text-red-500" },
           ].map(({ label, key, color }) => (
             <button
               key={key}
@@ -199,7 +191,6 @@ function Applicants() {
                   {/* Left: Candidate info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap mb-1">
-                      {/* Avatar initial */}
                       <div className="w-9 h-9 rounded-full bg-teal-100 text-teal-700 font-bold text-sm flex items-center justify-center shrink-0">
                         {c.full_name?.[0]?.toUpperCase() || "?"}
                       </div>
@@ -217,7 +208,6 @@ function Applicants() {
                       </div>
                     </div>
 
-                    {/* Job applied for */}
                     {c.jobs?.title && (
                       <p className="text-xs text-gray-400 mt-1 ml-11">
                         Applied for: <span className="font-semibold text-gray-600">{c.jobs.title}</span>
@@ -225,7 +215,6 @@ function Applicants() {
                       </p>
                     )}
 
-                    {/* AI summary */}
                     {c.ai_summary && (
                       <p className="text-xs text-gray-500 mt-2 ml-11 max-w-lg leading-relaxed">{c.ai_summary}</p>
                     )}
@@ -237,7 +226,6 @@ function Applicants() {
 
                   {/* Right: Actions */}
                   <div className="flex flex-col gap-2 items-end shrink-0">
-                    {/* Status dropdown */}
                     <select
                       value={c.status}
                       disabled={updating === c.id}
@@ -249,7 +237,6 @@ function Applicants() {
                       ))}
                     </select>
 
-                    {/* CV link */}
                     {c.cv_url && (
                       <a
                         href={c.cv_url}
@@ -261,7 +248,6 @@ function Applicants() {
                       </a>
                     )}
 
-                    {/* Quick action buttons */}
                     {c.status !== "shortlisted" && c.status !== "rejected" && (
                       <div className="flex gap-2">
                         <button

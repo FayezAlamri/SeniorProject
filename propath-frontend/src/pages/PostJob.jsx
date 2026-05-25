@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { useNavigate, Link } from "react-router-dom"
+import Navbar from "../components/Navbar"
 import { supabase } from "../supabaseClient"
 
 function PostJob() {
@@ -69,16 +70,9 @@ function PostJob() {
 
   return (
     <div className="min-h-screen bg-[#eaf2f7]">
-      {/* Navbar */}
-      <div className="flex justify-between items-center px-10 py-4 bg-white shadow-sm">
-        <Link to="/employer" className="flex items-center gap-2">
-          <div className="bg-teal-600 text-white p-2 rounded-lg w-8 h-8" />
-          <span className="font-bold text-lg">ProPath AI</span>
-        </Link>
-        <Link to="/employer" className="text-sm text-gray-500 hover:text-teal-600 transition">
-          ← Back to Dashboard
-        </Link>
-      </div>
+
+      {/* NAVBAR — unified component */}
+      <Navbar />
 
       <div className="max-w-2xl mx-auto px-6 py-12">
         <div className="mb-8">

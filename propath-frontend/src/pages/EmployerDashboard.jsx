@@ -12,14 +12,21 @@ function EmployerDashboard() {
   const [loadingCandidates, setLoadingCandidates] = useState(true)
   const [activeTab, setActiveTab] = useState("jobs")
 
-  // --- Auth check ---
+  // --- Auth + role check ---
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      if (!data.user) {
-        navigate("/login")
-      } else {
-        setUser(data.user)
+    supabase.auth.getUser().then(async ({ data }) => {
+      if (!data.user) { navigate("/login", { replace: true }); return }
+
+      // Check user_metadata first (set at signup, no RLS needed), then profiles table
+      let role = data.user.user_metadata?.role
+      if (!role) {
+        const { data: profile } = await supabase
+          .from("profiles").select("role").eq("id", data.user.id).single()
+        role = profile?.role
       }
+
+      if (role !== "employer") { navigate("/jobseeker", { replace: true }); return }
+      setUser(data.user)
     })
   }, [navigate])
 
