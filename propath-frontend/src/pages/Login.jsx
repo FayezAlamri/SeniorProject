@@ -33,7 +33,22 @@ function Login() {
     setLoading(false)
 
     if (authError) {
-      setError(authError.message)
+      // Email not confirmed — user registered but never clicked the confirmation link
+      if (
+        authError.message.toLowerCase().includes("email not confirmed") ||
+        authError.message.toLowerCase().includes("not confirmed")
+      ) {
+        setError(
+          "Your email address hasn't been confirmed yet. Please check your inbox and click the confirmation link we sent you."
+        )
+      } else if (
+        authError.message.toLowerCase().includes("invalid login credentials") ||
+        authError.message.toLowerCase().includes("invalid credentials")
+      ) {
+        setError("Incorrect email or password. Please try again.")
+      } else {
+        setError(authError.message)
+      }
       return
     }
 

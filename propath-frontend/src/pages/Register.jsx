@@ -12,11 +12,13 @@ function Register() {
   const [confirmPassword, setConfirmPassword] = useState("")
   const [role, setRole] = useState("jobseeker")
   const [error, setError] = useState("")
+  const [successMessage, setSuccessMessage] = useState("")
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
 
   const handleSubmit = async () => {
     setError("")
+    setSuccessMessage("")
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!firstName.trim()) { setError("Please enter your first name"); return }
@@ -29,19 +31,40 @@ function Register() {
 
     setLoading(true)
 
-    // 1. Create auth user
     const { data, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
     })
 
     if (signUpError) {
-      setError(signUpError.message)
       setLoading(false)
+      const msg = signUpError.message.toLowerCase()
+      if (msg.includes("user already registered") || msg.includes("already registered")) {
+        setError("An account with this email already exists. Please sign in instead.")
+      } else if (msg.includes("rate limit") || msg.includes("email rate")) {
+        setError("Too many attempts. Please wait a few minutes and try again.")
+      } else {
+        setError(signUpError.message)
+      }
       return
     }
 
-    // 2. Save profile with role + name
+    // null user means Supabase silently blocked it (duplicate email)
+    if (!data?.user?.id) {
+      setLoading(false)
+      setError("An account with this email already exists. Please sign in instead.")
+      return
+    }
+
+    // created_at will be old if Supabase faked a success for a duplicate email
+    const createdAt = new Date(data.user.created_at).getTime()
+    const secondsAgo = (Date.now() - createdAt) / 1000
+    if (secondsAgo > 10) {
+      setLoading(false)
+      setError("An account with this email already exists. Please sign in instead.")
+      return
+    }
+
     const { error: profileError } = await supabase
       .from("profiles")
       .insert({
@@ -57,12 +80,12 @@ function Register() {
       return
     }
 
-    // 3. Redirect based on role
-    if (role === "employer") {
-      navigate("/employer")
-    } else {
-      navigate("/jobseeker")
-    }
+    setSuccessMessage(
+      "Account created! Please check your email and click the confirmation link before signing in."
+    )
+    setTimeout(() => {
+      navigate("/login")
+    }, 4000)
   }
 
   return (
@@ -71,7 +94,6 @@ function Register() {
 
       <div className="min-h-screen bg-[#eaf2f7] flex">
 
-        {/* LEFT SIDE */}
         <div className="w-1/2 flex flex-col justify-center px-20">
           <div className="flex items-center gap-3 mb-8">
             <div className="bg-teal-600 text-white p-3 rounded-xl"></div>
@@ -81,7 +103,6 @@ function Register() {
           <p className="text-gray-600 text-lg">Your journey starts now</p>
         </div>
 
-        {/* RIGHT SIDE */}
         <div className="w-1/2 flex items-center justify-center">
           <div className="bg-white p-10 rounded-2xl shadow-lg w-[420px]">
 
@@ -105,7 +126,6 @@ function Register() {
               />
             </div>
 
-            {/* Role selector */}
             <div className="flex gap-3 mb-4">
               <button
                 onClick={() => setRole("jobseeker")}
@@ -162,9 +182,15 @@ function Register() {
               <p className="text-red-500 mb-4 text-sm">{error}</p>
             )}
 
+            {successMessage && (
+              <div className="bg-teal-50 border border-teal-300 text-teal-700 rounded-lg p-3 mb-4 text-sm">
+                {successMessage}
+              </div>
+            )}
+
             <button
               onClick={handleSubmit}
-              disabled={loading}
+              disabled={loading || !!successMessage}
               className="w-full bg-teal-600 text-white py-3 rounded-lg hover:bg-teal-700 transition disabled:opacity-60"
             >
               {loading ? "Creating account..." : "Sign Up"}
