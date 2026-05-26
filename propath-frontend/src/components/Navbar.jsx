@@ -261,9 +261,6 @@ function Navbar() {
             </>
           ) : (
             <>
-              <Link to="/home" className="text-gray-600 hover:text-teal-600 transition text-sm">Home</Link>
-              <a href="#features" className="text-gray-600 hover:text-teal-600 transition text-sm">Features</a>
-              <a href="#contact" className="text-gray-600 hover:text-teal-600 transition text-sm">Contact</a>
               <Link to="/login" className="text-gray-600 hover:text-teal-600 transition text-sm">Login</Link>
               <Link
                 to="/register"
